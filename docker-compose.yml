@@ -21,6 +21,7 @@ services:
   api:
     build: .
     container_name: securebank-api
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -31,6 +32,12 @@ services:
       JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/v3/api-docs > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   postgres_data:
